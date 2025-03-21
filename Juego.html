@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Polyglot Quest</title>
+  <style>
+    /* Estilos Generales */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      background: linear-gradient(135deg, #6dd5ed, #2193b0);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    header {
+      background: rgba(0, 0, 0, 0.3);
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    header p {
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      opacity: 0.8;
+    }
+    .container {
+      max-width: 500px;
+      width: 90%;
+      margin: 20px auto;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+    button {
+      background: #ff7f50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+    button:hover {
+      background: #ff6347;
+      transform: scale(1.05);
+    }
+    .hidden {
+      display: none;
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Preguntas y Opciones */
+    #question {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    #options button {
+      width: 100%;
+      margin: 5px 0;
+      background: #6dd5ed;
+    }
+    #options button:hover {
+      background: #2193b0;
+    }
+    #result {
+      font-size: 1.2rem;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    /* Datos Curiosos */
+    .fact-card {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      text-align: left;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .fact-card p {
+      color: #fff;
+    }
+
+    /* Final del Juego */
+    #end-screen {
+      text-align: center;
+    }
+    #user-data-form input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 1rem;
+    }
+    #prize-message {
+      font-size: 1.2rem;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #ff7f50;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Polyglot Quest</h1>
+    <p>Valida tus conocimientos en inglés y francés mientras aprendes datos curiosos</p>
+  </header>
+  <div class="container fade-in">
+    <div id="start-screen">
+      <h2>¡Bienvenido a Polyglot Quest!</h2>
+      <p>Elige el idioma para comenzar:</p>
+      <button onclick="startGame('en')">Inglés</button>
+      <button onclick="startGame('fr')">Francés</button>
+    </div>
+    <div id="game-screen" class="hidden">
+      <h2 id="language-title"></h2>
+      <p id="question"></p>
+      <div id="options"></div>
+      <p id="result" class="hidden"></p>
+    </div>
+    <div id="fact-screen" class="hidden">
+      <div id="fact-card" class="fact-card">
+        <p id="curious-fact"></p>
+      </div>
+      <button onclick="nextQuestion()">Continuar Juego</button>
+    </div>
+    <div id="end-screen" class="hidden">
+      <h2>¡Juego completado!</h2>
+      <p id="final-score"></p>
+      <form id="user-data-form" class="hidden">
+        <input type="text" id="name" placeholder="Nombre completo" required>
+        <input type="tel" id="phone" placeholder="Teléfono" required>
+        <input type="email" id="email" placeholder="Correo electrónico" required>
+        <button type="button" onclick="submitUserData()">Enviar datos</button>
+      </form>
+      <p id="prize-message" class="hidden"></p>
+    </div>
+  </div>
+
+  <script>
+    const questions = {
+      en: [
+        { 
+          level: 1, 
+          question: "What is 'hello' in English?", 
+          options: ["Hi", "Goodbye", "Thank you"], 
+          answer: "Hi", 
+          fact: "Cuando dices 'hello', tu cerebro activa una red compleja de neuronas que conectan el significado de la palabra con tu idioma nativo. Este proceso involucra áreas como el lóbulo temporal, encargado del lenguaje, y el sistema límbico, que maneja las emociones asociadas. Por ejemplo, cuando escuchas 'hello', tu cerebro lo traduce automáticamente a 'hola' si tu idioma nativo es el español, todo en milisegundos." 
+        },
+        { 
+          level: 1, 
+          question: "What is the opposite of 'hot'?", 
+          options: ["Cold", "Warm", "Cool"], 
+          answer: "Cold", 
+          fact: "La palabra 'cold' no solo describe una temperatura baja, sino que también activa áreas del cerebro relacionadas con sensaciones físicas. Por ejemplo, al pensar en 'cold', tu cerebro puede evocar recuerdos de tocar hielo o sentir una brisa fría. Este fenómeno se llama 'sinestesia cruzada', donde las palabras desencadenan experiencias sensoriales. Además, estudios han demostrado que aprender vocabulario relacionado con sensaciones mejora tu capacidad para recordar palabras." 
+        },
+        { 
+          level: 2, 
+          question: "Which word means 'friend'?", 
+          options: ["Enemy", "Friend", "Family"], 
+          answer: "Friend", 
+          fact: "La palabra 'friend' activa regiones del cerebro vinculadas a la empatía y las relaciones sociales. De hecho, estudios han demostrado que aprender un nuevo idioma mejora tu capacidad para entender y conectar emocionalmente con personas de diferentes culturas. Por ejemplo, decir 'friend' en inglés puede hacer que pienses en valores universales como la confianza y la lealtad. Además, el acto de aprender un idioma fomenta la apertura mental y la tolerancia hacia otras culturas." 
+        },
+        { 
+          level: 2, 
+          question: "What is 'water' in English?", 
+          options: ["Fire", "Water", "Air"], 
+          answer: "Water", 
+          fact: "El cerebro humano asocia rápidamente palabras como 'water' con imágenes mentales y emociones. Por ejemplo, al escuchar 'water', podrías imaginar un río sereno, un vaso fresco o incluso el sonido de una cascada. Este proceso se debe a que el cerebro utiliza tanto el hemisferio izquierdo (para el lenguaje) como el derecho (para las imágenes). Además, investigaciones han demostrado que aprender vocabulario relacionado con elementos naturales, como 'water', fortalece las conexiones neuronales y mejora la memoria a largo plazo." 
+        },
+        { 
+          level: 3, 
+          question: "What is the past tense of 'go'?", 
+          options: ["Went", "Gone", "Going"], 
+          answer: "Went", 
+          fact: "El verbo 'went' es un ejemplo fascinante de cómo el cerebro procesa el tiempo verbal. Aunque parece no tener conexión directa con 'go', proviene del verbo arcaico 'wend', que significa 'moverse'. Este tipo de irregularidades en los verbos ingleses desafían al cerebro a recordar patrones históricos y lingüísticos, mejorando así la memoria a largo plazo. Además, aprender verbos irregulares en un idioma extranjero estimula áreas del cerebro responsables del pensamiento crítico y la resolución de problemas." 
+        }
+      ],
+      fr: [
+        { 
+          level: 1, 
+          question: "Qu'est-ce que 'bonjour' en français?", 
+          options: ["Salut", "Au revoir", "Merci"], 
+          answer: "Salut", 
+          fact: "Al dire 'bonjour', tu cerveau activa conexiones neuronales asociadas con la cortesía y la interacción social. Este proceso involucra áreas como el córtex prefrontal, que regula el comportamiento social. Además, tu cerebro también evalúa el tono y el contexto para determinar si es un saludo formal o informal. Por ejemplo, 'salut' se utiliza en contextos informales, mientras que 'bonjour' es más adecuado en situaciones formales." 
+        },
+        { 
+          level: 1, 
+          question: "Quel est l'opposé de 'chaud'?", 
+          options: ["Froid", "Chaud", "Tiède"], 
+          answer: "Froid", 
+          fact: "La palabra 'froid' no solo describe una temperatura baja, sino que también activa áreas del cerebro relacionadas con sensaciones físicas. Por ejemplo, al pensar en 'froid', tu cerebro puede evocar recuerdos de tocar hielo o sentir una brisa fría. Este fenómeno se llama 'sinestesia cruzada', donde las palabras desencadenan experiencias sensoriales. Además, estudios han demostrado que aprender vocabulario relacionado con sensaciones mejora tu capacidad para recordar palabras
